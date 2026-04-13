@@ -1,0 +1,42 @@
+# WorldMonitor — Development / Demo environment
+#
+# Usage:
+#   cp .env.dev.example .env.dev
+#   # Edit .env.dev with your API keys
+#   docker compose -f docker-compose.dev.yml --env-file .env.dev up --build
+#
+# After startup:
+#   - Vite dev server: http://<server-ip>:3000
+#   - Configure 1Panel website to reverse-proxy your dev subdomain to port 3000
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    volumes:
+      - ..:/app
+      - dev_node_modules:/app/node_modules
+      - dev_blog_modules:/app/blog-site/node_modules
+    ports:
+      - "${WM_DEV_PORT:-3000}:3000"
+    env_file: .env.dev
+    environment:
+      - UPSTASH_REDIS_REST_URL=http://redis-rest-proxy:80
+      - UPSTASH_REDIS_REST_TOKEN=${REDIS_REST_TOKEN:-dev-token}
+    depends_on:
+      - redis-rest-proxy
+    restart: unless-stopped
+
+  redis-rest-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.redis-rest
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:6379/0}
+      - SRH_TOKEN=${REDIS_REST_TOKEN:-dev-token}
+    restart: unless-stopped
+
+volumes:
+  dev_node_modules:
+  dev_blog_modules:

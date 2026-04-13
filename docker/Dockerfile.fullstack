@@ -1,0 +1,53 @@
+# Full-stack production image for WorldMonitor.
+# Stage 1: Build frontend (Vite) + compile API handlers (esbuild).
+# Stage 2: Serve via nginx + Node.js local-api-server, managed by supervisord.
+
+# ── Stage 1: Builder ─────────────────────────────────────────────────────────
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+COPY . .
+
+RUN npm ci --include=dev
+
+ARG VITE_VARIANT=full
+ENV VITE_VARIANT=${VITE_VARIANT}
+
+# Build frontend (blog + tsc + vite)
+RUN npm run build
+
+# Compile API handlers (TS → JS bundles, JS → inlined deps)
+RUN node docker/build-handlers.mjs
+
+# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
+FROM node:22-alpine AS runtime
+
+RUN apk add --no-cache nginx gettext supervisor
+
+WORKDIR /app
+
+# Copy built frontend assets
+COPY --from=builder /app/dist/ /usr/share/nginx/html/
+
+# Copy compiled API handlers (local-api-server discovers these via readdir)
+COPY --from=builder /app/api/ ./api/
+
+# Copy local-api-server
+COPY --from=builder /app/src-tauri/sidecar/local-api-server.mjs ./local-api-server.mjs
+
+# Copy shared data files used by API handlers at runtime
+COPY --from=builder /app/shared/ ./shared/
+
+# nginx config template (envsubst resolves LOCAL_API_PORT at startup)
+COPY docker/nginx.conf /etc/nginx/nginx.conf.template
+
+# supervisord config
+COPY docker/supervisord.conf /etc/supervisor/conf.d/worldmonitor.conf
+
+# Entrypoint: secrets bridge + envsubst + supervisord
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 8080
+
+CMD ["/entrypoint.sh"]

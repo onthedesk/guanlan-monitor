@@ -843,7 +843,11 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3000,
       open: !isE2E,
-      hmr: isE2E ? false : undefined,
+      hmr: isE2E
+        ? false
+        : process.env.HMR_HOST
+          ? { host: process.env.HMR_HOST, clientPort: Number(process.env.HMR_CLIENT_PORT || 443) }
+          : undefined,
       watch: {
         ignored: [
           '**/test-results/**',

@@ -1,0 +1,36 @@
+# WorldMonitor — Production environment
+#
+# Usage:
+#   cp .env.prod.example .env.prod
+#   # Edit .env.prod with your API keys
+#   docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+#
+# After startup:
+#   - App serves on http://<server-ip>:${WM_PROD_PORT:-8080}
+#   - Configure 1Panel website to reverse-proxy your prod subdomain to that port
+
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.fullstack
+      args:
+        VITE_VARIANT: ${VITE_VARIANT:-full}
+    ports:
+      - "${WM_PROD_PORT:-8080}:8080"
+    env_file: .env.prod
+    environment:
+      - UPSTASH_REDIS_REST_URL=http://redis-rest-proxy:80
+      - UPSTASH_REDIS_REST_TOKEN=${REDIS_REST_TOKEN:-prod-token}
+    depends_on:
+      - redis-rest-proxy
+    restart: unless-stopped
+
+  redis-rest-proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.redis-rest
+    environment:
+      - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:6379/1}
+      - SRH_TOKEN=${REDIS_REST_TOKEN:-prod-token}
+    restart: unless-stopped
