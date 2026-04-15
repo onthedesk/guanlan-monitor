@@ -5,7 +5,7 @@ import { isProUser } from './widget-store';
 export enum PanelGateReason {
   NONE = 'none',           // show content (pro user, or desktop with API key, or non-premium panel)
   ANONYMOUS = 'anonymous', // "Sign In to Unlock"
-  FREE_TIER = 'free_tier', // "Upgrade to Pro"
+  FREE_TIER = 'free_tier', // Logged-in free tier — premium panels gated without upsell CTA
 }
 
 /**

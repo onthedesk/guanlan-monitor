@@ -12,7 +12,10 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY blog-site/package.json blog-site/package-lock.json ./blog-site/
 
-RUN npm ci
+# Override at build time if npmjs.org is flaky from your network, e.g.:
+# docker compose build --build-arg NPM_CONFIG_REGISTRY=https://registry.npmmirror.com
+ARG NPM_CONFIG_REGISTRY=https://registry.npmjs.org
+RUN npm ci --registry="${NPM_CONFIG_REGISTRY}"
 
 EXPOSE 3000
 

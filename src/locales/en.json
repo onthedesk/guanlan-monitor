@@ -2854,6 +2854,8 @@
     "resendVerification": "Resend Verification",
     "upgradeDesc": "Upgrade to Pro for full access to premium analytics",
     "upgradeToPro": "Upgrade to Pro",
+    "restrictedPanel": "This feature is not available.",
+    "notificationsUnavailable": "Notification alerts are not available in this deployment.",
     "features": {
       "orefSirens1": "Real-time Israel missile & rocket alerts",
       "orefSirens2": "Siren zone mapping with threat classification",

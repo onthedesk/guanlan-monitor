@@ -1615,7 +1615,7 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
 
     const isPro = hasPremiumAccess(getAuthState());
     if (!isPro) {
-      const gateEl = this.makeProLocked('Bypass corridors available with PRO');
+      const gateEl = this.makeProLocked('Bypass corridor data is not available.');
       gateEl.addEventListener('click', () => trackGateHit('sector-bypass-corridors'), { once: true });
       bypassContent.append(gateEl);
     } else {
@@ -2146,28 +2146,28 @@ export class CountryDeepDivePanel implements CountryBriefPanel {
     );
     this.costShockCalcBody = costShockCalcBody;
     costShockCalcBody.append(
-      isPro ? this.makeLoading('Loading cost shock calculator\u2026') : this.makeProLocked('Upgrade to PRO for multi-sector cost shock modelling'),
+      isPro ? this.makeLoading('Loading cost shock calculator\u2026') : this.makeProLocked('Multi-sector cost shock modelling is not available.'),
     );
 
     const [productImportsCard, productImportsCardBody] = this.sectionCard('Product Imports', 'Top imported products by HS4 code with supplier breakdown and concentration risk.');
     this.productImportsBody = productImportsCardBody;
-    productImportsCardBody.append(isPro ? this.makeLoading('Loading product data\u2026') : this.makeProLocked('Upgrade to PRO for product import data'));
+    productImportsCardBody.append(isPro ? this.makeLoading('Loading product data\u2026') : this.makeProLocked('Product import data is not available.'));
 
     const [debtCard, debtBody] = this.sectionCard('National Debt', 'Government debt-to-GDP ratio, total debt, and year-over-year growth.');
     this.debtBody = debtBody;
-    debtBody.append(isPro ? this.makeLoading('Loading debt data\u2026') : this.makeProLocked('Upgrade to PRO for national debt data'));
+    debtBody.append(isPro ? this.makeLoading('Loading debt data\u2026') : this.makeProLocked('National debt data is not available.'));
 
     const [sanctionsCard, sanctionsBody] = this.sectionCard('Sanctions Pressure', 'Sanctioned entities, vessels, and aircraft linked to this country.');
     this.sanctionsBody = sanctionsBody;
-    sanctionsBody.append(isPro ? this.makeLoading('Loading sanctions data\u2026') : this.makeProLocked('Upgrade to PRO for sanctions data'));
+    sanctionsBody.append(isPro ? this.makeLoading('Loading sanctions data\u2026') : this.makeProLocked('Sanctions data is not available.'));
 
     const [comtradeCard, comtradeBody] = this.sectionCard('Trade Flows', 'Top Comtrade trade flows sorted by value, with partner and commodity.');
     this.comtradeBody = comtradeBody;
-    comtradeBody.append(isPro ? this.makeLoading('Loading trade flows\u2026') : this.makeProLocked('Upgrade to PRO for trade flow data'));
+    comtradeBody.append(isPro ? this.makeLoading('Loading trade flows\u2026') : this.makeProLocked('Trade flow data is not available.'));
 
     const [tariffCard, tariffBody] = this.sectionCard('Tariff Trends', 'Effective tariff rate and historical trend direction.');
     this.tariffBody = tariffBody;
-    tariffBody.append(isPro ? this.makeLoading('Loading tariff data\u2026') : this.makeProLocked('Upgrade to PRO for tariff trend data'));
+    tariffBody.append(isPro ? this.makeLoading('Loading tariff data\u2026') : this.makeProLocked('Tariff trend data is not available.'));
 
 
     this.signalsBody = signalBody;

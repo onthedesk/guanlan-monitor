@@ -7,7 +7,7 @@
 #
 # After startup:
 #   - App serves on http://<server-ip>:${WM_PROD_PORT:-8080}
-#   - Configure 1Panel website to reverse-proxy your prod subdomain to that port
+#   - On 1panel-network OpenResty can use: proxy_pass http://guanlan-prod-app:8080;
 
 services:
   app:
@@ -16,21 +16,37 @@ services:
       dockerfile: docker/Dockerfile.fullstack
       args:
         VITE_VARIANT: ${VITE_VARIANT:-full}
+        NPM_CONFIG_REGISTRY: ${NPM_CONFIG_REGISTRY:-https://registry.npmjs.org}
     ports:
       - "${WM_PROD_PORT:-8080}:8080"
     env_file: .env.prod
     environment:
-      - UPSTASH_REDIS_REST_URL=http://redis-rest-proxy:80
+      - UPSTASH_REDIS_REST_URL=http://guanlan-prod-redis-rest:80
       - UPSTASH_REDIS_REST_TOKEN=${REDIS_REST_TOKEN:-prod-token}
     depends_on:
       - redis-rest-proxy
     restart: unless-stopped
+    networks:
+      one-panel:
+        aliases:
+          - guanlan-prod-app
 
   redis-rest-proxy:
     build:
       context: .
       dockerfile: Dockerfile.redis-rest
+    networks:
+      one-panel:
+        aliases:
+          - guanlan-prod-redis-rest
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - REDIS_URL=${REDIS_URL:-redis://host.docker.internal:6379/1}
       - SRH_TOKEN=${REDIS_REST_TOKEN:-prod-token}
     restart: unless-stopped
+
+networks:
+  one-panel:
+    name: 1panel-network
+    external: true

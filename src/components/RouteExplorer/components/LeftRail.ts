@@ -68,7 +68,7 @@ export class LeftRail {
 
   private renderGate(): void {
     this.element.innerHTML =
-      '<div class="re-leftrail__empty">Upgrade to PRO for route intelligence.</div>';
+      '<div class="re-leftrail__empty">Route intelligence is not available.</div>';
   }
 
   private static readonly FLAG_LABELS: Record<string, string> = {

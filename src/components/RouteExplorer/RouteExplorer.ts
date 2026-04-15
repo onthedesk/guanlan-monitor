@@ -345,21 +345,9 @@ export class RouteExplorer {
     if (this.contentEl) {
       this.contentEl.innerHTML =
         '<div class="re-content__gate">' +
-        '<h3>Unlock route intelligence</h3>' +
-        '<ul><li>Current route with chokepoint risk</li><li>Ranked bypass alternatives</li><li>Overland corridor options</li></ul>' +
-        '<button class="re-content__upgrade" type="button">Upgrade to PRO</button>' +
+        '<h3>Route intelligence</h3>' +
+        '<p class="re-content__gate-desc">Route intelligence is not available in this deployment.</p>' +
         '</div>';
-      const btn = this.contentEl.querySelector<HTMLButtonElement>('.re-content__upgrade');
-      btn?.addEventListener('click', () => {
-        this.trackEvent('route-explorer:free-cta-click', {
-          from: this.state.fromIso2 ?? '',
-          to: this.state.toIso2 ?? '',
-          hs2: this.state.hs2 ?? '',
-        });
-        void import('@/services/checkout')
-          .then((m) => m.startCheckout('pro_monthly'))
-          .catch(() => window.open('https://worldmonitor.app/pro', '_blank'));
-      }, { once: true });
     }
   }
 

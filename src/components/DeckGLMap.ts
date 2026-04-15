@@ -203,6 +203,17 @@ const LAYER_ZOOM_THRESHOLDS: Partial<Record<keyof MapLayers, { minZoom: number; 
 // Export for external use
 export { LAYER_ZOOM_THRESHOLDS };
 
+/** MapLibre shader name for Protomaps "ghost" fill layers; compilation can fail on strict GPU drivers. */
+function isMapStyleShaderCompileFailure(message: string): boolean {
+  const m = message.toLowerCase();
+  return (
+    m.includes('bases-layer-ghost')
+    || m.includes('ghost-fragment')
+    || (m.includes('shader') && (m.includes('compilation') || m.includes('compile')))
+    || m.includes('failed to compile shader')
+  );
+}
+
 // Theme-aware overlay color function — refreshed each buildLayers() call
 function getOverlayColors() {
   const isLight = getCurrentTheme() === 'light';
@@ -835,6 +846,10 @@ export class DeckGLMap {
     this.maplibreMap.on('error', (e: { error?: Error; message?: string }) => {
       const msg = e.error?.message ?? e.message ?? '';
       console.warn('[DeckGLMap] map error:', msg);
+      if (isMapStyleShaderCompileFailure(msg)) {
+        recreateWithFallback();
+        return;
+      }
       if (msg.includes('Failed to fetch') || msg.includes('AJAXError') || msg.includes('CORS') || msg.includes('NetworkError') || msg.includes('403') || msg.includes('Forbidden')) {
         tileErrorCount++;
         if (!tileLoadOk && tileErrorCount >= 2) {
@@ -6492,6 +6507,11 @@ export class DeckGLMap {
     const onError = (e: { error?: Error; message?: string }) => {
       if (gen !== this.tileMonitorGeneration) { cleanup(); return; }
       const msg = e.error?.message ?? e.message ?? '';
+      if (isMapStyleShaderCompileFailure(msg)) {
+        cleanup();
+        this.switchToFallbackStyle(mapTheme);
+        return;
+      }
       if (msg.includes('Failed to fetch') || msg.includes('AJAXError') || msg.includes('CORS') || msg.includes('NetworkError') || msg.includes('403') || msg.includes('Forbidden')) {
         errCount++;
         if (!ok && errCount >= 2) {
