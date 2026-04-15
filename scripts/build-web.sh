@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-# Production web build: blog (Astro) + TypeScript check + Vite bundle → dist/
+# 宿主机本地构建 dist/（blog + tsc + vite），与 package.json 的 npm run build 相同。
+#
+# 生产环境若使用 Docker：Vite 构建发生在镜像构建阶段，请用
+#   bash scripts/docker-prod-deploy.sh deploy
+# 对应 docker/Dockerfile.fullstack 里的 RUN npm run build，勿与本脚本混淆。
 #
 # Usage:
 #   bash scripts/build-web.sh              # full build (same as npm run build)

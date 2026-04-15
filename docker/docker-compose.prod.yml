@@ -5,6 +5,10 @@
 #   # Edit .env.prod with your API keys
 #   docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
 #
+# 从仓库根目录（推荐）:
+#   bash scripts/docker-prod-deploy.sh deploy
+#   （内部使用 docker/docker-compose.prod.yml 与 docker/.env.prod）
+#
 # After startup:
 #   - App serves on http://<server-ip>:${WM_PROD_PORT:-8080}
 #   - On 1panel-network OpenResty can use: proxy_pass http://guanlan-prod-app:8080;
